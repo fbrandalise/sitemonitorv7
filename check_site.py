@@ -50,14 +50,14 @@ for url in URLS:
         while i < len(diff):
             line = diff[i]
             if line.startswith("- ") and i + 1 < len(diff) and diff[i + 1].startswith("+ "):
-                intuitive_diff_lines.append(f"🔸 De: "{line[2:].strip()}"")
-                intuitive_diff_lines.append(f"🔸 Para: "{diff[i+1][2:].strip()}"")
+                intuitive_diff_lines.append(f"🔸 De: \"{line[2:].strip()}\"")
+                intuitive_diff_lines.append(f"🔸 Para: \"{diff[i+1][2:].strip()}\"")
                 i += 2
             elif line.startswith("- ") and not (i + 1 < len(diff) and diff[i + 1].startswith("+ ")):
-                intuitive_diff_lines.append(f"🔸 Removido: "{line[2:].strip()}"")
+                intuitive_diff_lines.append(f"🔸 Removido: \"{line[2:].strip()}\"")
                 i += 1
             elif line.startswith("+ ") and not (i > 0 and diff[i - 1].startswith("- ")):
-                intuitive_diff_lines.append(f"🔸 Adicionado: "{line[2:].strip()}"")
+                intuitive_diff_lines.append(f"🔸 Adicionado: \"{line[2:].strip()}\"")
                 i += 1
             else:
                 i += 1
