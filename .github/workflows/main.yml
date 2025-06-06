@@ -1,0 +1,48 @@
+name: Monitorar site diariamente
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Rodar monitoramento do site
+        id: run_check_site
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        run: |
+          python check_site.py
+
+      - name: Enviar e-mail com resultado
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Relatório diário - Monitoramento de site"
+          body: |
+            ${{ steps.run_check_site.outputs.has_changes == 'true' && format('✅ Mudança detectada! URL: {0}', steps.run_check_site.outputs.changed_url) || '✅ Monitoramento concluído. Nenhuma mudança detectada.' }}
+
+            ${{ steps.run_check_site.outputs.has_changes == 'true' && format('📄 Diferença percebida:\n\n{0}', steps.run_check_site.outputs.intuitive_diff_text) || '' }}
+
+          attachments: planos_atual.html
+          to: seu-email@gmail.com
+          from: seu-email@gmail.com
